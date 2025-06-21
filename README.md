@@ -217,37 +217,38 @@ done:
 ; Multiplication table of 10
 .org 0x9000
 
-ldb 1       ;multiple
-ldc 11      ;upto
-mov8_mem_imm 0x0000 42  ; * 
-mov8_mem_imm 0x0001 10  ; table of
-mov8_mem_imm 0x0002 32  ; space
-mov8_mem_imm 0x0003 61  ; =
+```assembly
+ldb 1                 ; Set B = 1 (current multiplier)
+ldc 11                ; Set C = 11 (limit for the loop: up to 10)
+mov8_mem_imm 0x0000 42  ; Store '*' at memory[0x0000] (ASCII 42)
+mov8_mem_imm 0x0001 10  ; Store line feed at memory[0x0001] (ASCII 10)
+mov8_mem_imm 0x0002 32  ; Store space at memory[0x0002] (ASCII 32)
+mov8_mem_imm 0x0003 61  ; Store '=' at memory[0x0003] (ASCII 61)
 
 print:
-    lda 10;
-    printa;
-    lda 32;
-    printc;
-    lda 42;
-    printc;
-    lda 32;
-    printc;
-    mov_reg_reg a b;
-    printa;
-    lda 32;
-    printc;
-    lda 61;
-    printc;
-    lda 32;
-    printc;
-    lda 10;
-    mul;
-    printa;
-    lda 10;
-    printc;
+    lda 10            ; Load 10 into A (the base number)
+    printa            ; Print A (10)
+    lda 32            ; Load space character
+    printc            ; Print space
+    lda 42            ; Load '*' character
+    printc            ; Print '*'
+    lda 32            ; Load space character
+    printc            ; Print space
+    mov_reg_reg a b   ; Copy B (multiplier) to A
+    printa            ; Print current multiplier
+    lda 32            ; Load space character
+    printc            ; Print space
+    lda 61            ; Load '=' character
+    printc            ; Print '='
+    lda 32            ; Load space character
+    printc            ; Print space
+    lda 10            ; Load 10 into A (the base number)
+    mul               ; Multiply A by B (A = A * B)
+    printa            ; Print result (product)
+    lda 10            ; Load line feed character
+    printc            ; Print newline
 
-inc b;
-jlt print;
-halt;
+    inc b             ; Increment multiplier (B = B + 1)
+    jlt print         ; If B < C (i.e., multiplier <= 10), repeat loop
+halt                  ; End program
 ```
