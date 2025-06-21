@@ -34,9 +34,6 @@ mov8_mem_imm 0x0001 10  ; table of
 mov8_mem_imm 0x0002 32  ; space
 mov8_mem_imm 0x0003 61  ; =
 
-
-
-
 print:
     lda 10;
     printa;
