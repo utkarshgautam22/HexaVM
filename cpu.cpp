@@ -1,9 +1,8 @@
-#include "setup.h"
-#include <iostream>
-#include <chrono>
+#include "cpu.h"
 
-bool run = 1;
 CPU cpu;
+
+bool cpu_running = 1;
 
 void wait_cycles(uint8_t cycles)
 {
@@ -18,21 +17,14 @@ void wait_cycles(uint8_t cycles)
     }
 }
 
-void setup()
-{
-    cpu.reset();
-    cpu.pc = 0x9000;
-}
-
-int main()
+void start()
 
 {
-    setup();
     int8 rem;
     uint8_t arg1, arg2;
     uint16_t addr;
-    char reg;
-    while (run)
+    char reg, reg1;
+    while (cpu_running)
     {
         int8 opcode = memory[cpu.pc++];
         switch (opcode)
@@ -98,7 +90,25 @@ int main()
             }
             break;
         case PRINT_A:
-            std::cout << "A: " << cpu.a;
+            std::cout << std::dec << cpu.a;
+            break;
+        case PRINT_R:
+            reg = (char)memory[cpu.pc++];
+            switch (reg)
+            {
+            case 'a':
+                std::cout << cpu.a;
+                break;
+            case 'b':
+                std::cout << cpu.b;
+                break;
+            case 'c':
+                std::cout << cpu.c;
+                break;
+            default:
+                std::cerr << "Unknown register: " << reg << std::endl;
+                cpu_running = false; // Stop execution on unknown register
+            }
             break;
         case PRINT_CHAR:
             std::cout << static_cast<char>(cpu.a & 0xFF);
@@ -127,7 +137,7 @@ int main()
                 cpu.pc = addr;
             break;
         case HLT:
-            run = false;
+            cpu_running = false;
             break;
         case JN:
             arg1 = memory[cpu.pc++];
@@ -215,7 +225,7 @@ int main()
 
         case MOV_REG_REG:
             reg = (char)memory[cpu.pc++];
-            // char reg2 = (char)memory[cpu.pc++];
+            reg1 = (char)memory[cpu.pc++];
             if (reg == 'a')
                 cpu.a = cpu.b;
             else
@@ -435,12 +445,12 @@ int main()
                 break;
 
             case 0xFF: // SYS_EXIT
-                run = false;
+                cpu_running = false;
                 break;
 
             default:
                 std::cerr << "Unknown syscall: " << syscall_num << std::endl;
-                run = false;
+                cpu_running = false;
                 break;
             }
             break;
@@ -470,7 +480,7 @@ int main()
 
             default:
                 std::cerr << "Unhandled INT " << std::hex << (int)int_num << "\n";
-                run = false;
+                cpu_running = false;
                 break;
             }
             break;
@@ -480,12 +490,12 @@ int main()
             cpu.reset();
             break;
         case HALT:
-            run = false;
+            cpu_running = false;
             break;
         default:
             // Unknown opcode
             std::cerr << "Unknown opcode: " << static_cast<int>(opcode) << " at PC: " << cpu.pc - 1 << std::endl;
-            run = false; // Stop execution on unknown opcode
+            cpu_running = false; // Stop execution on unknown opcode
             break;
         }
     }

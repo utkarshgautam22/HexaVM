@@ -1,10 +1,13 @@
+#ifndef SETUP_H
+#define SETUP_H
+
 #include <cstdint>
 #include <stack>
 #define MEMORY_MAX 0xffff // in bytes
 #define uc unsigned char
 #define int8 uint8_t
 
-uint8_t memory[MEMORY_MAX];
+extern uint8_t memory[MEMORY_MAX];
 
 enum opcodes : uint8_t
 {
@@ -67,7 +70,8 @@ enum opcodes : uint8_t
     JLT = 0x43, // Jump if A < B
 
     INC = 0x44,     // increment reg
-    LDC_IMM = 0x45, // Load constant into reg (16-bit)S
+    LDC_IMM = 0x45, // Load constant into reg (16-bit)
+    PRINT_R = 0x46, // Print register
 
     // ───────────────────────
     // Stack & Subroutine
@@ -103,7 +107,7 @@ enum opcodes : uint8_t
     HALT = 0xFF     // True HALT
 };
 
-uint16_t instruction_base = 0x9000; // Start of instructions in memory
+extern uint16_t instruction_base;
 
 struct CPU
 {
@@ -128,3 +132,5 @@ struct CPU
             stack.pop();
     }
 };
+
+#endif // SETUP_H
